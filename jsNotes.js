@@ -404,20 +404,24 @@ function Calculator() {
     var str1 = '';
     var str2 = '';
     var method = '';
-    for (var i = 0; i < str.length; i++) {
-      if (str.charAt(i) != ' ') {
+    for (var i = 0, acc = ''; i < str.length; i++) {
+      if (str.charAt(i) == ' ') {
+        acc += str.charAt(i);
+        continue;
+      }
+      if (acc == '') {
         str1 += str.charAt(i);
-      } else if (!isNaN(str.charAt(i)) && str.charAt(i) != ' ' && str.charAt(i - 1) == ' ') {
+      } else if (acc == ' ') {
+        method += str.charAt(i);
+      } else if (acc == '  ') {
         str2 += str.charAt(i);
       }
-      // else if (!isNaN(str.charAt(i - 2)) && str.charAt(i) != ' ' && str.charAt(i - 1) == ' ') {
-      //   str2 += str.charAt(i);
-      // }!isNaN(str.charAt(i)) && str.charAt(i) != ' ' && str.charAt(i - 1) != ' '
+
 
     }
     v1 = +str1;
     v2 = +str2;
-    console.log(this["+"](v1, v2));
+    console.log(v1, v2, method);
   };
 
 }
@@ -428,4 +432,4 @@ cal.addMethod("+", function(a, b) {
   return a + b;
 });
 
-cal.calculate('77 691');
+cal.calculate('123 + 4321');
