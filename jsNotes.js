@@ -1,3 +1,4 @@
+'use strict';
 //console.log("Hello world!"); важно умение правильно абстагироваться
 /* Если имя св недопустимое имя переменной или получаеться путем вычисления то obj["John Doe"] или можно подставить переменные, код ниже наглядно это иллюстрирует */
 var obj1 = {
@@ -392,10 +393,12 @@ function Calculator1() {
 
 }
 
+//Достаточно непростая задачка на конструктор
 function Calculator() {
   var v1 = 0;
   var v2 = 0;
 
+  //еще можно заранее создать служебный обьект в который и будем помещать методы
   this.addMethod = function(name, func) {
     this[name] = func;
   };
@@ -421,7 +424,7 @@ function Calculator() {
     }
     v1 = +str1;
     v2 = +str2;
-    console.log(v1, v2, method);
+    return this[method](v1, v2);
   };
 
 }
@@ -431,5 +434,127 @@ var cal = new Calculator();
 cal.addMethod("+", function(a, b) {
   return a + b;
 });
+cal.addMethod("*", function(a, b) {
+  return a * b;
+});
+cal.addMethod("/", function(a, b) {
+  return a / b;
+});
+cal.addMethod("**", function(a, b) {
+  return Math.pow(a, b);
+});
+//console.log(cal.calculate('2 ** 3'));
 
-cal.calculate('123 + 4321');
+//ГЕТТЕРЫ И СЕТТЕРЫ
+//get возвращает рез своей ф-ции в свойстве для которого обьявлен
+//set задает значение для свойства, через параметр, который передается внутрь функции. т.е обьявленая через set доллжна принимать аргумент
+// и она получит этот арг через =
+// пример для литерала
+var user = {
+  firstName: "Вася",
+  surname: "Петров"
+}
+
+Object.defineProperty(user, "fullName", {
+
+  get: function() {
+    return this.firstName + ' ' + this.surname;
+  },
+
+  set: function(value) {
+    var split = value.split(' ');
+    this.firstName = split[0];
+    this.surname = split[1];
+  }
+});
+
+user.fullName = "Петя Иванов";
+// console.log(user.firstName); // Петя
+// console.log(user.surname); // Иванов
+
+//Статические методы и свойства и фабричные методы
+//даже когда мы declaration функцию мы уже создаем объект, и в этот обьект можно что-то добавить(свойство, метод, и даже функцию конструктор)
+// по сути фабричный метод этот функция(метод) которая вернет обьект
+function Article() {
+  Article.count++;
+
+  //...
+}
+Article.count = 0;
+
+Article.showCount = function() {
+  console.log(this.count); // (1)
+}
+
+// использование
+// Article();
+// Article();
+// Article();
+// Article();
+// Article.showCount(); // (2)
+
+
+// call apply. func.call(context, arg1, arg2, ...) context становиться this для функции
+// можно одалживать методы
+function prArgs() {
+  var join = [].join;
+  var str = join.call(arguments, " "); //arguments это обьект в контексте которого будет вызван join
+  console.log(str);
+
+}
+//prArgs(5, 10, 15);
+//apply тоже самое что и call только принимает вторым арг массив из аргуметов а не просто перечисление
+function sumArgs() {
+  var reduce = [].reduce;
+  var args = [].slice.call(arguments);
+  return reduce.call(args, function(a, b) {
+    return a + b;
+  });
+}
+//console.log(sumArgs(1, 2));
+//интересная реализация обоих
+function applyAll(func) {
+  return func.apply(this, [].slice.call(arguments, 1));
+}
+
+function mul() { // перемножает аргументы: mul(2,3,4) = 24
+  return [].reduce.call(arguments, function(a, b) {
+    return a * b;
+  });
+}
+//console.log(applyAll(mul, 2, 3, 4));
+
+
+// bind привязывает функцию к контексту создавая обертку(замыкание) и это можно сохранить в переменную
+// var wrapper = func.bind(context[, arg1, arg2...]); аргументы если их указать то станут перед передаваемыми непосредственно обертке
+//в отличие от call apply не вызывает функцию а только создает обертку с привязкой
+//заранее задавать аргументы для функции(частично или полностью) называеться каррированием
+"use strict";
+
+function ask(question, answer, ok, fail) {
+  var result = "1234"
+  if (result.toLowerCase() == answer.toLowerCase()) ok();
+  else fail();
+}
+
+var user = {
+  login: 'Василий',
+  password: '12345',
+
+  loginOk: function() {
+    console.log(this.login + ' вошёл в сайт');
+  },
+
+  loginFail: function() {
+    console.log(this.login + ': ошибка входа');
+  },
+
+  checkPassword: function() {
+    ask("Ваш пароль?", this.password, this.loginOk.bind(this), this.loginFail.bind(this));
+  }
+};
+
+// user.checkPassword();
+// var vasya = user;
+// user = null;
+// vasya.checkPassword();
