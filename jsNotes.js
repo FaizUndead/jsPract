@@ -558,3 +558,95 @@ var user = {
 // var vasya = user;
 // user = null;
 // vasya.checkPassword();
+
+//Декораторы, главные черты декоратора я выделю, создание замыкания(обертки), во внутренней ф-ции используеться f.apply(this, arguments);
+// помимо этого производяться еще какие либо действия например с аргументами
+//функцию обычно следует отдекорировать, в переменную в которой когда-то было тело функции передать вызов декоратора над этой функцией
+// function checkNumber(value) {
+//   return typeof value == 'number';
+// }
+// // декоратор, проверяющий типы для f
+// // второй аргумент checks - массив с функциями для проверки
+// function typeCheck(f, checks) {
+//   return function() {
+//     for (var i = 0; i < arguments.length; i++) {
+//       if (!checks[i](arguments[i])) {
+//         alert("Некорректный тип аргумента номер " + i);
+//         return;
+//       }
+//     }
+//     return f.apply(this, arguments);
+//   }
+// }
+
+// function sum(a, b) {
+//   return a + b;
+// }
+
+// // обернём декоратор для проверки
+// sum = typeCheck(sum, [checkNumber, checkNumber]); // оба аргумента - числа
+
+// // пользуемся функцией как обычно
+// alert(sum(1, 2)); // 3, все хорошо
+
+// // а вот так - будет ошибка
+// sum(true, null); // некорректный аргумент номер 0
+// sum(1, ["array", "in", "sum?!?"]); // некорректный аргумент номер 1
+
+function makeLogging(f, log) {
+  function wrapper() { // еще можно создать обертку вот так
+    for (var i = 0; i < arguments.length; i++) {
+      log.push(arguments[i]);
+    }
+    return f.apply(this, arguments);
+  }
+  return wrapper;
+}
+
+function work(a) {
+  return a;
+}
+var log = [];
+work = makeLogging(work, log);
+work(1, 2); // 1, добавлено в log
+work(5);
+work(5);
+//console.log(log);
+function fRan(x) {
+  return Math.random() * x; // random для удобства тестирования
+}
+
+function makeCaching(f) {
+  var cArg = null;
+  var cRes = null;
+
+  return function wrapper(arg) {
+    if (arg == cArg) {
+      return cRes;
+    }
+    cArg = arg;
+    cRes = f.call(this, arg);
+    return cRes;
+  }
+}
+// fRan = makeCaching(fRan);
+
+// var a, b;
+
+// a = fRan(1);
+// b = fRan(1);
+// console.log(a);
+// console.log(b);
+
+// b = fRan(2);
+// console.log(b);
+// b = fRan(2);
+// console.log(b);
+
+
+//setTimeout setInterval работают асинхронно
+var timerId = setTimeout(function tick() {
+  console.log("тик");
+  timerId = setTimeout(tick, 2000);
+}, 2000);
+console.log('test');

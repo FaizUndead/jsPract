@@ -57,8 +57,8 @@ var list2 = new LinkedList([4, 5, 6]);
 LinkedList.prototype.printValues(list);
 // list.clear();
 // list.printValues();
-// console.log(list.getValue(2));
-// list2.printValues();
+//console.log(list.getValue(2));
+//list2.printValues();
 // console.log(list2.getValue(2));
 
 
